@@ -1,0 +1,132 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { Settings } from 'lucide-react'
+import { DeviceHeader } from '@/components/kiosk/DeviceHeader'
+import { StudentNameInput } from '@/components/kiosk/StudentNameInput'
+import { ActivityTracker } from '@/components/kiosk/ActivityTracker'
+import { Logo } from '@/components/shared/Logo'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { useDevice } from '@/lib/hooks/useDevice'
+import { useSession } from '@/lib/hooks/useSession'
+import { supabase } from '@/lib/supabase/client'
+
+export default function KioskPage({ params: { locale } }: { params: { locale: string } }) {
+  const t = useTranslations('kiosk')
+  const router = useRouter()
+  const { device, deviceId, loading: deviceLoading } = useDevice()
+  const { activeSession, sessionType, loading: sessionLoading } = useSession()
+  const [students, setStudents] = useState<string[]>([])
+  const [isOnline, setIsOnline] = useState(true)
+
+  // Monitor online status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
+  // Update device students when students array changes
+  useEffect(() => {
+    if (!device?.id) return
+
+    const updateStudents = async () => {
+      await fetch('/api/device-students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          device_id: device.id,
+          student_names: students,
+          session_id: activeSession?.id || null,
+        }),
+      })
+    }
+
+    updateStudents()
+  }, [students, device?.id, activeSession?.id])
+
+  // Redirect to session page when active session exists
+  useEffect(() => {
+    if (activeSession && sessionType) {
+      router.push(`/${locale}/kiosk/session/${activeSession.id}`)
+    }
+  }, [activeSession, sessionType, locale, router])
+
+  if (deviceLoading || sessionLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Logo size={120} className="mb-4" />
+          <p className="text-lg text-muted-foreground">{t('loading', { ns: 'common' })}</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-white to-primary-50">
+      <DeviceHeader
+        deviceName={device?.device_name || 'Unknown Device'}
+        isOnline={isOnline}
+      />
+
+      <main className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="text-center mb-8">
+          <Logo size={120} className="mb-6" />
+          <h1 className="text-4xl font-bold text-secondary mb-2">
+            {t('welcome')}
+          </h1>
+        </div>
+
+        <div className="space-y-6">
+          <StudentNameInput students={students} onStudentsChange={setStudents} />
+
+          <Card className="bg-primary/10 border-primary">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-xl text-secondary font-medium">
+                  {t('waitingForSession')}
+                </p>
+                <div className="flex justify-center mt-4">
+                  <div className="animate-pulse flex space-x-2">
+                    <div className="w-3 h-3 bg-primary rounded-full"></div>
+                    <div className="w-3 h-3 bg-primary rounded-full animation-delay-200"></div>
+                    <div className="w-3 h-3 bg-primary rounded-full animation-delay-400"></div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-center">
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/${locale}/kiosk/settings`)}
+              className="gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              {t('settings')}
+            </Button>
+          </div>
+        </div>
+      </main>
+
+      <ActivityTracker
+        deviceId={deviceId || ''}
+        sessionId={null}
+        enabled={!!deviceId}
+      />
+    </div>
+  )
+}
+
