@@ -36,6 +36,7 @@ export function useDevice() {
         } else {
           // Register new device
           const deviceName = getDeviceName()
+          // @ts-expect-error - Supabase generated types issue
           const { data: newDevice, error } = await supabase
             .from('devices')
             .insert({
@@ -43,7 +44,7 @@ export function useDevice() {
               device_name: deviceName,
               is_active: true,
               last_seen: new Date().toISOString(),
-            } as any)
+            })
             .select()
             .single()
 
@@ -68,6 +69,7 @@ export function useDevice() {
       heartbeatInterval = setInterval(async () => {
         const uptimeSeconds = Math.floor(performance.now() / 1000)
 
+        // @ts-expect-error - Supabase generated types issue
         await supabase
           .from('devices')
           .update({
@@ -77,7 +79,7 @@ export function useDevice() {
             battery_charging: battery.charging,
             uptime_seconds: uptimeSeconds,
             updated_at: new Date().toISOString(),
-          } as any)
+          })
           .eq('device_fingerprint', id)
       }, 30000)
     }
@@ -95,9 +97,10 @@ export function useDevice() {
   const updateDeviceName = async (name: string) => {
     if (!deviceId) return
 
+    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabase
       .from('devices')
-      .update({ device_name: name } as any)
+      .update({ device_name: name })
       .eq('device_fingerprint', deviceId)
       .select()
       .single()

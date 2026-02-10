@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
   try {
     const { name, url_template, icon_url, allow_url_preview, iframe_enabled } = await request.json()
 
+    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabaseAdmin
       .from('session_types')
       .insert({
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
         icon_url: icon_url || null,
         allow_url_preview: allow_url_preview || false,
         iframe_enabled: iframe_enabled !== false,
-      } as any)
+      })
       .select()
       .single()
 
@@ -52,6 +53,7 @@ export async function PUT(request: NextRequest) {
   try {
     const { id, name, url_template, icon_url, allow_url_preview, iframe_enabled } = await request.json()
 
+    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabaseAdmin
       .from('session_types')
       .update({
@@ -60,7 +62,7 @@ export async function PUT(request: NextRequest) {
         icon_url,
         allow_url_preview,
         iframe_enabled,
-      } as any)
+      })
       .eq('id', id)
       .select()
       .single()

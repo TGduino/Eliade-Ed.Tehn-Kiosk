@@ -28,9 +28,10 @@ export async function PUT(request: NextRequest) {
   try {
     const { id, device_name } = await request.json()
 
+    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabaseAdmin
       .from('devices')
-      .update({ device_name } as any)
+      .update({ device_name })
       .eq('id', id)
       .select()
       .single()

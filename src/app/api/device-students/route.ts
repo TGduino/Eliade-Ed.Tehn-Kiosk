@@ -16,13 +16,14 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       // Update existing entry
+      // @ts-expect-error - Supabase generated types issue
       const { data, error } = await supabaseAdmin
         .from('device_students')
         .update({
           student_names,
           session_id: session_id || null,
           joined_at: new Date().toISOString(),
-        } as any)
+        })
         .eq('id', existing.id)
         .select()
         .single()
@@ -31,13 +32,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(data)
     } else {
       // Create new entry
+      // @ts-expect-error - Supabase generated types issue
       const { data, error } = await supabaseAdmin
         .from('device_students')
         .insert({
           device_id,
           student_names,
           session_id: session_id || null,
-        } as any)
+        })
         .select()
         .single()
 

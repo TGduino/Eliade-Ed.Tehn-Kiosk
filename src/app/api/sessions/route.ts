@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
   try {
     const { name, session_type_id, settings } = await request.json()
 
+    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabaseAdmin
       .from('sessions')
       .insert({
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
         created_by: 'admin',
         started_at: new Date().toISOString(),
         settings: settings || null,
-      } as any)
+      })
       .select()
       .single()
 
@@ -58,6 +59,7 @@ export async function PUT(request: NextRequest) {
       updateData.ended_at = ended_at
     }
 
+    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabaseAdmin
       .from('sessions')
       .update(updateData)
