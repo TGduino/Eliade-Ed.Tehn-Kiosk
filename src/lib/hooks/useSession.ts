@@ -14,8 +14,15 @@ export function useSession() {
 
     async function fetchActiveSession() {
       try {
+        // Check if Supabase is configured
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+        if (!supabaseUrl || supabaseUrl === 'https://placeholder.supabase.co') {
+          setLoading(false)
+          return
+        }
+
         // Get the most recent active session
-        const { data: sessions } = await supabase
+        const { data: sessions, error } = await supabase
           .from('sessions')
           .select('*, session_types(*)')
           .eq('status', 'active')
@@ -24,7 +31,9 @@ export function useSession() {
 
         if (!mounted) return
 
-        if (sessions && sessions.length > 0) {
+        if (error) {
+          console.error('Failed to fetch sessions:', error)
+        } else if (sessions && sessions.length > 0) {
           const session = sessions[0] as any
           setActiveSession(session as Session)
           setSessionType((session.session_types as SessionType) || null)

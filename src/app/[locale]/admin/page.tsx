@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { LogOut, Monitor, Activity, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -19,7 +19,9 @@ import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
 import type { Device, Session, SessionType } from '@/types'
 
-export default function AdminDashboardPage({ params: { locale } }: { params: { locale: string } }) {
+export default function AdminDashboardPage() {
+  const params = useParams()
+  const locale = (params?.locale as string) || 'en'
   const t = useTranslations('admin')
   const tCommon = useTranslations('common')
   const router = useRouter()

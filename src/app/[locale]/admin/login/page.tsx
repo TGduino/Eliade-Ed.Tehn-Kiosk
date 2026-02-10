@@ -1,12 +1,14 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Logo } from '@/components/shared/Logo'
 import { LanguageToggle } from '@/components/shared/LanguageToggle'
 import { AdminPasswordDialog } from '@/components/shared/AdminPasswordDialog'
 
-export default function AdminLoginPage({ params: { locale } }: { params: { locale: string } }) {
+export default function AdminLoginPage() {
+  const params = useParams()
+  const locale = (params?.locale as string) || 'en'
   const t = useTranslations('admin')
   const router = useRouter()
 

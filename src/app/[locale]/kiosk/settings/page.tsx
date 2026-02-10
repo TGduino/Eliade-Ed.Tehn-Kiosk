@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -20,7 +20,9 @@ import { useDevice } from '@/lib/hooks/useDevice'
 import { resetDevice } from '@/lib/utils/deviceFingerprint'
 import { useToast } from '@/components/ui/use-toast'
 
-export default function SettingsPage({ params: { locale } }: { params: { locale: string } }) {
+export default function SettingsPage() {
+  const params = useParams()
+  const locale = (params?.locale as string) || 'en'
   const t = useTranslations('kiosk')
   const tCommon = useTranslations('common')
   const router = useRouter()

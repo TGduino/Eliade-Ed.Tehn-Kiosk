@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Settings } from 'lucide-react'
 import { DeviceHeader } from '@/components/kiosk/DeviceHeader'
@@ -13,7 +13,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useDevice } from '@/lib/hooks/useDevice'
 import { useSession } from '@/lib/hooks/useSession'
 
-export default function KioskPage({ params: { locale } }: { params: { locale: string } }) {
+export default function KioskPage() {
+  const params = useParams()
+  const locale = (params?.locale as string) || 'en'
   const t = useTranslations('kiosk')
   const tCommon = useTranslations('common')
   const router = useRouter()

@@ -24,19 +24,30 @@ export function useDevice() {
 
         setDeviceId(id)
 
+        // Check if Supabase is configured
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+        if (!supabaseUrl || supabaseUrl === 'https://placeholder.supabase.co') {
+          console.warn('Supabase not configured, device will work in offline mode')
+          setLoading(false)
+          return
+        }
+
         // Check if device exists in database
-        const { data: existingDevice } = await supabase
+        const { data: existingDevice, error: fetchError } = await supabase
           .from('devices')
           .select('*')
           .eq('device_fingerprint', id)
           .single()
 
-        if (existingDevice) {
+        if (fetchError && fetchError.code !== 'PGRST116') {
+          // PGRST116 is "not found" which is expected for new devices
+          console.error('Failed to fetch device:', fetchError)
+        } else if (existingDevice) {
           setDevice(existingDevice as Device)
         } else {
           // Register new device
           const deviceName = getDeviceName()
-          const { data: newDevice, error } = await supabase
+          const { data: newDevice, error: insertError } = await supabase
             .from('devices')
             .insert({
               device_fingerprint: id,
@@ -47,8 +58,8 @@ export function useDevice() {
             .select()
             .single()
 
-          if (error) {
-            console.error('Failed to register device:', error)
+          if (insertError) {
+            console.error('Failed to register device:', insertError)
           } else if (newDevice) {
             setDevice(newDevice as Device)
           }
@@ -66,19 +77,23 @@ export function useDevice() {
     function startHeartbeat(id: string) {
       // Update device status every 30 seconds
       heartbeatInterval = setInterval(async () => {
-        const uptimeSeconds = Math.floor(performance.now() / 1000)
+        try {
+          const uptimeSeconds = Math.floor(performance.now() / 1000)
 
-        await supabase
-          .from('devices')
-          .update({
-            last_seen: new Date().toISOString(),
-            is_active: true,
-            battery_level: battery.level,
-            battery_charging: battery.charging,
-            uptime_seconds: uptimeSeconds,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('device_fingerprint', id)
+          await supabase
+            .from('devices')
+            .update({
+              last_seen: new Date().toISOString(),
+              is_active: true,
+              battery_level: battery.level,
+              battery_charging: battery.charging,
+              uptime_seconds: uptimeSeconds,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('device_fingerprint', id)
+        } catch (error) {
+          console.error('Heartbeat failed:', error)
+        }
       }, 30000)
     }
 

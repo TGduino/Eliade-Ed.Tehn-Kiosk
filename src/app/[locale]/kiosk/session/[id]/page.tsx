@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { DeviceHeader } from '@/components/kiosk/DeviceHeader'
 import { SessionViewer } from '@/components/kiosk/SessionViewer'
 import { ActivityTracker } from '@/components/kiosk/ActivityTracker'
@@ -9,11 +9,10 @@ import { useDevice } from '@/lib/hooks/useDevice'
 import { supabase } from '@/lib/supabase/client'
 import type { Session, SessionType } from '@/types'
 
-export default function SessionPage({
-  params: { locale, id }
-}: {
-  params: { locale: string; id: string }
-}) {
+export default function SessionPage() {
+  const params = useParams()
+  const locale = (params?.locale as string) || 'en'
+  const id = (params?.id as string) || ''
   const router = useRouter()
   const { device, deviceId } = useDevice()
   const [session, setSession] = useState<Session | null>(null)
