@@ -11,17 +11,32 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  params: { locale }
+  params
 }: {
   children: React.ReactNode
   params: { locale: string }
 }) {
-  const messages = await getMessages({ locale })
+  const { locale } = params
+  const validLocale = locale === 'en' || locale === 'ro' ? locale : 'en'
+  
+  // Safely load messages with fallback
+  let messages
+  try {
+    messages = await getMessages({ locale: validLocale })
+  } catch (error) {
+    console.error(`Could not load messages for locale ${validLocale}:`, error)
+    // Fallback to default locale messages
+    try {
+      messages = (await import(`../../../messages/${validLocale}.json`)).default
+    } catch {
+      messages = (await import(`../../../messages/en.json`)).default
+    }
+  }
 
   return (
-    <html lang={locale}>
+    <html lang={validLocale}>
       <body className="font-sans">
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <NextIntlClientProvider locale={validLocale} messages={messages}>
           {children}
           <Toaster />
         </NextIntlClientProvider>
