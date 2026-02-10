@@ -11,6 +11,11 @@ const intlMiddleware = createMiddleware({
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Handle root path - redirect to default locale
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/en/kiosk', request.url))
+  }
+
   // Check if the path is an admin route (after locale prefix), but NOT the login page
   const isAdminRoute = pathname.match(/^\/(en|ro)\/admin/) && !pathname.match(/^\/(en|ro)\/admin\/login/)
 
@@ -19,7 +24,7 @@ export async function middleware(request: NextRequest) {
 
     if (!token) {
       // Redirect to admin login if no token
-      const locale = pathname.split('/')[1]
+      const locale = pathname.split('/')[1] || 'en'
       return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url))
     }
 
@@ -32,7 +37,7 @@ export async function middleware(request: NextRequest) {
       await jwtVerify(token, secret)
     } catch (error) {
       // Token invalid, redirect to login
-      const locale = pathname.split('/')[1]
+      const locale = pathname.split('/')[1] || 'en'
       const response = NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url))
       response.cookies.delete('admin_token')
       return response

@@ -14,23 +14,20 @@ export default async function RootLayout({
   params
 }: {
   children: React.ReactNode
-  params: { locale: string }
+  params: Promise<{ locale: string }> | { locale: string }
 }) {
-  const { locale } = params
+  // Handle params - could be Promise in Next.js 15
+  const resolvedParams = params instanceof Promise ? await params : params
+  const locale = resolvedParams.locale || 'en'
   const validLocale = locale === 'en' || locale === 'ro' ? locale : 'en'
   
-  // Safely load messages with fallback
+  // Direct import - simpler and more reliable
   let messages
   try {
-    messages = await getMessages({ locale: validLocale })
-  } catch (error) {
-    console.error(`Could not load messages for locale ${validLocale}:`, error)
-    // Fallback to default locale messages
-    try {
-      messages = (await import(`../../../messages/${validLocale}.json`)).default
-    } catch {
-      messages = (await import(`../../../messages/en.json`)).default
-    }
+    messages = (await import(`../../../messages/${validLocale}.json`)).default
+  } catch {
+    // Fallback to English
+    messages = (await import(`../../../messages/en.json`)).default
   }
 
   return (

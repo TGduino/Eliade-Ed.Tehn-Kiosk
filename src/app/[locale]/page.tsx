@@ -1,6 +1,12 @@
 import { redirect } from 'next/navigation'
 
-export default function HomePage({ params: { locale } }: { params: { locale: string } }) {
+export default async function HomePage({
+  params
+}: {
+  params: Promise<{ locale: string }> | { locale: string }
+}) {
+  const resolvedParams = params instanceof Promise ? await params : params
+  const locale = resolvedParams.locale || 'en'
   redirect(`/${locale}/kiosk`)
 }
 
