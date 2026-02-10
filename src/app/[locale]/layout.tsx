@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
 import { Toaster } from '@/components/ui/toaster'
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 import '../globals.css'
@@ -34,33 +33,39 @@ export default async function RootLayout({
     let messages: Record<string, any> = {}
     console.log('[Layout] Loading messages for locale:', validLocale)
     
+    // Bypass getMessages() completely - use direct imports for reliability
     try {
-      console.log('[Layout] Calling getMessages()...')
-      messages = await getMessages({ locale: validLocale })
-      console.log('[Layout] getMessages() succeeded, keys:', Object.keys(messages).length)
+      console.log('[Layout] Loading messages via direct import for locale:', validLocale)
+      if (validLocale === 'ro') {
+        const roMessages = await import(`../../../messages/ro.json`)
+        messages = roMessages.default || {}
+        console.log('[Layout] Romanian messages loaded, keys:', Object.keys(messages).length)
+      } else {
+        const enMessages = await import(`../../../messages/en.json`)
+        messages = enMessages.default || {}
+        console.log('[Layout] English messages loaded, keys:', Object.keys(messages).length)
+      }
     } catch (error) {
-      console.error('[Layout] getMessages() failed:', error)
-      console.error('[Layout] Error details:', error instanceof Error ? error.message : String(error))
+      console.error('[Layout] Direct import failed:', error)
+      console.error('[Layout] Error type:', error instanceof Error ? error.constructor.name : typeof error)
+      console.error('[Layout] Error message:', error instanceof Error ? error.message : String(error))
+      console.error('[Layout] Error stack:', error instanceof Error ? error.stack : 'No stack')
       
-      // Fallback: try direct import
+      // Fallback to English
       try {
-        console.log('[Layout] Falling back to direct import...')
-        if (validLocale === 'ro') {
-          const roMessages = await import(`../../../messages/ro.json`)
-          messages = roMessages.default || {}
-        } else {
-          const enMessages = await import(`../../../messages/en.json`)
-          messages = enMessages.default || {}
-        }
-        console.log('[Layout] Direct import succeeded, keys:', Object.keys(messages).length)
+        console.log('[Layout] Falling back to English...')
+        const enMessages = await import(`../../../messages/en.json`)
+        messages = enMessages.default || {}
+        console.log('[Layout] English fallback loaded, keys:', Object.keys(messages).length)
       } catch (fallbackError) {
-        console.error('[Layout] Direct import also failed:', fallbackError)
+        console.error('[Layout] English fallback also failed:', fallbackError)
         // Last resort: minimal fallback
         messages = {
           common: { loading: 'Loading...', error: 'Error', success: 'Success' },
           kiosk: { welcome: 'Welcome', waitingForSession: 'Waiting for session...' },
           admin: { welcome: 'Admin Dashboard' }
         }
+        console.log('[Layout] Using minimal fallback messages')
       }
     }
 
