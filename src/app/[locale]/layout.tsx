@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { NextIntlClientProvider } from 'next-intl'
 import { Toaster } from '@/components/ui/toaster'
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
@@ -87,14 +88,47 @@ export default async function RootLayout({
       hasKiosk: !!messages.kiosk
     })
     
+    // Validate messages one more time before passing to NextIntlClientProvider
+    if (!messages || typeof messages !== 'object') {
+      console.error('[Layout] Messages validation failed at render time!')
+      throw new Error('Messages object is invalid')
+    }
+    
+    // Ensure messages is a plain serializable object
+    let plainMessages: Record<string, any>
+    try {
+      plainMessages = JSON.parse(JSON.stringify(messages))
+      console.log('[Layout] Messages serialized successfully')
+    } catch (serializeError) {
+      console.error('[Layout] Failed to serialize messages:', serializeError)
+      // Use minimal fallback if serialization fails
+      plainMessages = {
+        common: { loading: 'Loading...', error: 'Error', success: 'Success' },
+        kiosk: { welcome: 'Welcome', waitingForSession: 'Waiting for session...' },
+        admin: { welcome: 'Admin Dashboard' }
+      }
+    }
+    
+    console.log('[Layout] About to render NextIntlClientProvider with locale:', validLocale)
+    console.log('[Layout] Messages keys count:', Object.keys(plainMessages).length)
+    
+    // Wrap children in Suspense to catch any async errors
     return (
       <html lang={validLocale}>
         <body className="font-sans">
           <ErrorBoundary>
-            <NextIntlClientProvider locale={validLocale} messages={messages}>
-              {children}
-              <Toaster />
-            </NextIntlClientProvider>
+            <Suspense fallback={
+              <div style={{ padding: '2rem', textAlign: 'center' }}>
+                <p>Loading...</p>
+              </div>
+            }>
+              <NextIntlClientProvider locale={validLocale} messages={plainMessages}>
+                <Suspense fallback={<div>Loading content...</div>}>
+                  {children}
+                </Suspense>
+                <Toaster />
+              </NextIntlClientProvider>
+            </Suspense>
           </ErrorBoundary>
         </body>
       </html>

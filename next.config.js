@@ -15,6 +15,11 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  // Show detailed errors in production for debugging
+  onDemandEntries: {
+    maxInactiveAge: 60 * 1000,
+    pagesBufferLength: 5,
+  },
 }
 
 module.exports = withNextIntl(nextConfig)
