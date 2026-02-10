@@ -86,7 +86,7 @@ export default async function RootLayout({
       <html lang={validLocale}>
         <body className="font-sans">
           <ErrorBoundary>
-            <NextIntlClientProvider locale={validLocale} messages={serializedMessages}>
+            <NextIntlClientProvider locale={validLocale} messages={messages}>
               {children}
               <Toaster />
             </NextIntlClientProvider>
