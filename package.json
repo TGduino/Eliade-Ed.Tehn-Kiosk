@@ -29,7 +29,8 @@
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "html2canvas": "^1.4.1",
-    "jose": "^5.9.6"
+    "jose": "^5.9.6",
+    "next-intl": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
@@ -40,7 +41,6 @@
     "postcss": "^8.4.47",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.18",
-    "next-intl": "^3.22.0"
+    "eslint-config-next": "14.2.18"
   }
 }

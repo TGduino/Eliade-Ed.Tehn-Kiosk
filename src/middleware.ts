@@ -11,8 +11,8 @@ const intlMiddleware = createMiddleware({
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Check if the path is an admin route (after locale prefix)
-  const isAdminRoute = pathname.match(/^\/(en|ro)\/admin/)
+  // Check if the path is an admin route (after locale prefix), but NOT the login page
+  const isAdminRoute = pathname.match(/^\/(en|ro)\/admin/) && !pathname.match(/^\/(en|ro)\/admin\/login/)
 
   if (isAdminRoute) {
     const token = request.cookies.get('admin_token')?.value
