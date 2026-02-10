@@ -25,9 +25,8 @@ export function useSession() {
         if (!mounted) return
 
         if (sessions && sessions.length > 0) {
-          const session = sessions[0]
+          const session = sessions[0] as any
           setActiveSession(session)
-          // @ts-ignore - session_types is populated
           setSessionType(session.session_types || null)
         }
       } catch (error) {

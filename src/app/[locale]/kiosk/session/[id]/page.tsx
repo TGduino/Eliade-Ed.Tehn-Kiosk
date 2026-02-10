@@ -29,12 +29,12 @@ export default function SessionPage({
         .single()
 
       if (data) {
-        setSession(data)
-        // @ts-ignore
-        setSessionType(data.session_types)
+        const sessionData = data as any
+        setSession(sessionData)
+        setSessionType(sessionData.session_types)
 
         // Check if session is no longer active
-        if (data.status !== 'active') {
+        if (sessionData.status !== 'active') {
           router.push(`/${locale}/kiosk`)
         }
       }

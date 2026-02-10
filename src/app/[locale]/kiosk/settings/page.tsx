@@ -43,7 +43,7 @@ export default function SettingsPage({ params: { locale } }: { params: { locale:
     } else {
       toast({
         title: tCommon('error'),
-        description: t('incorrectPassword', { ns: 'admin' }),
+        description: 'Incorrect password',
         variant: 'destructive',
       })
     }
