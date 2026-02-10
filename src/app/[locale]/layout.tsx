@@ -16,21 +16,12 @@ export default async function RootLayout({
   children: React.ReactNode
   params: { locale: string }
 }) {
-  // Validate locale and load messages
-  const validLocale = ['en', 'ro'].includes(locale) ? locale : 'en'
-  
-  let messages
-  try {
-    messages = (await import(`../../../messages/${validLocale}.json`)).default
-  } catch (error) {
-    console.error('Failed to load messages:', error)
-    messages = {}
-  }
+  const messages = await getMessages({ locale })
 
   return (
-    <html lang={validLocale}>
+    <html lang={locale}>
       <body className="font-sans">
-        <NextIntlClientProvider locale={validLocale} messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
           <Toaster />
         </NextIntlClientProvider>
