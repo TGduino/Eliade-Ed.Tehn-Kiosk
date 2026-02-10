@@ -32,11 +32,10 @@ export function useDevice() {
           .single()
 
         if (existingDevice) {
-          setDevice(existingDevice)
+          setDevice(existingDevice as Device)
         } else {
           // Register new device
           const deviceName = getDeviceName()
-          // @ts-expect-error - Supabase generated types issue
           const { data: newDevice, error } = await supabase
             .from('devices')
             .insert({
@@ -51,7 +50,7 @@ export function useDevice() {
           if (error) {
             console.error('Failed to register device:', error)
           } else if (newDevice) {
-            setDevice(newDevice)
+            setDevice(newDevice as Device)
           }
         }
 
@@ -69,7 +68,6 @@ export function useDevice() {
       heartbeatInterval = setInterval(async () => {
         const uptimeSeconds = Math.floor(performance.now() / 1000)
 
-        // @ts-expect-error - Supabase generated types issue
         await supabase
           .from('devices')
           .update({
@@ -97,7 +95,6 @@ export function useDevice() {
   const updateDeviceName = async (name: string) => {
     if (!deviceId) return
 
-    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabase
       .from('devices')
       .update({ device_name: name })
@@ -108,7 +105,7 @@ export function useDevice() {
     if (error) {
       console.error('Failed to update device name:', error)
     } else if (data) {
-      setDevice(data)
+      setDevice(data as Device)
       localStorage.setItem('device_name', name)
     }
   }
@@ -120,4 +117,3 @@ export function useDevice() {
     updateDeviceName,
   }
 }
-

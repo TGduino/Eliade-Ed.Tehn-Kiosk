@@ -30,8 +30,8 @@ export default function SessionPage({
 
       if (data) {
         const sessionData = data as any
-        setSession(sessionData)
-        setSessionType(sessionData.session_types)
+        setSession(sessionData as Session)
+        setSessionType(sessionData.session_types as SessionType)
 
         // Check if session is no longer active
         if (sessionData.status !== 'active') {
@@ -110,4 +110,3 @@ export default function SessionPage({
     </div>
   )
 }
-

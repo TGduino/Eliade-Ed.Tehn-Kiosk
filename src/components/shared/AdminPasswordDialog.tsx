@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,6 +28,7 @@ export function AdminPasswordDialog({
 }: AdminPasswordDialogProps) {
   const t = useTranslations('admin')
   const tCommon = useTranslations('common')
+  const tKiosk = useTranslations('kiosk')
   const { toast } = useToast()
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -76,7 +76,7 @@ export function AdminPasswordDialog({
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="password">{t('password', { ns: 'kiosk' })}</Label>
+            <Label htmlFor="password">{tKiosk('password')}</Label>
             <Input
               id="password"
               type="password"
@@ -103,4 +103,3 @@ export function AdminPasswordDialog({
     </Dialog>
   )
 }
-

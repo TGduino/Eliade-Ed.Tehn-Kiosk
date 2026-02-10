@@ -6,17 +6,17 @@ export async function POST(request: NextRequest) {
     const { device_id, student_names, session_id } = await request.json()
 
     // Check if entry exists for this device
-    const { data: existing } = await supabaseAdmin
+    const { data: existingData } = await supabaseAdmin
       .from('device_students')
       .select('*')
       .eq('device_id', device_id)
       .order('joined_at', { ascending: false })
       .limit(1)
-      .single()
+
+    const existing = existingData && existingData.length > 0 ? existingData[0] : null
 
     if (existing) {
       // Update existing entry
-      // @ts-expect-error - Supabase generated types issue
       const { data, error } = await supabaseAdmin
         .from('device_students')
         .update({
@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(data)
     } else {
       // Create new entry
-      // @ts-expect-error - Supabase generated types issue
       const { data, error } = await supabaseAdmin
         .from('device_students')
         .insert({
@@ -54,4 +53,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

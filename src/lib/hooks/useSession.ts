@@ -26,8 +26,8 @@ export function useSession() {
 
         if (sessions && sessions.length > 0) {
           const session = sessions[0] as any
-          setActiveSession(session)
-          setSessionType(session.session_types || null)
+          setActiveSession(session as Session)
+          setSessionType((session.session_types as SessionType) || null)
         }
       } catch (error) {
         console.error('Failed to fetch active session:', error)
@@ -61,7 +61,7 @@ export function useSession() {
                 .single()
 
               setActiveSession(session)
-              setSessionType(type)
+              setSessionType(type as SessionType)
             } else if (session.status === 'completed' || session.status === 'paused') {
               // Clear active session if it's completed or paused
               if (activeSession?.id === session.id) {
@@ -86,4 +86,3 @@ export function useSession() {
     loading,
   }
 }
-

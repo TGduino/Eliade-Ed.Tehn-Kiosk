@@ -24,7 +24,6 @@ export async function POST(request: NextRequest) {
   try {
     const { name, session_type_id, settings } = await request.json()
 
-    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabaseAdmin
       .from('sessions')
       .insert({
@@ -54,12 +53,11 @@ export async function PUT(request: NextRequest) {
   try {
     const { id, status, ended_at } = await request.json()
 
-    const updateData: any = { status }
+    const updateData: Record<string, any> = { status }
     if (ended_at) {
       updateData.ended_at = ended_at
     }
 
-    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabaseAdmin
       .from('sessions')
       .update(updateData)
@@ -78,4 +76,3 @@ export async function PUT(request: NextRequest) {
     )
   }
 }
-

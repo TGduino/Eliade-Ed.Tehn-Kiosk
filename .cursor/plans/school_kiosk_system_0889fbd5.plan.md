@@ -379,7 +379,7 @@ graph TB
 **Environment Variables**
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+												NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_key
 ADMIN_PASSWORD=your_secure_password

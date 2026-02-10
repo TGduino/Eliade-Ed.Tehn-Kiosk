@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
       keyboard_activity_count,
     } = await request.json()
 
-    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabaseAdmin
       .from('device_activity')
       .insert({
@@ -38,4 +37,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

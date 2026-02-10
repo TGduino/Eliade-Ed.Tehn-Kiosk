@@ -12,10 +12,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useDevice } from '@/lib/hooks/useDevice'
 import { useSession } from '@/lib/hooks/useSession'
-import { supabase } from '@/lib/supabase/client'
 
 export default function KioskPage({ params: { locale } }: { params: { locale: string } }) {
   const t = useTranslations('kiosk')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const { device, deviceId, loading: deviceLoading } = useDevice()
   const { activeSession, sessionType, loading: sessionLoading } = useSession()
@@ -67,7 +67,7 @@ export default function KioskPage({ params: { locale } }: { params: { locale: st
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Logo size={120} className="mb-4" />
-          <p className="text-lg text-muted-foreground">{t('loading', { ns: 'common' })}</p>
+          <p className="text-lg text-muted-foreground">{tCommon('loading')}</p>
         </div>
       </div>
     )
@@ -129,4 +129,3 @@ export default function KioskPage({ params: { locale } }: { params: { locale: st
     </div>
   )
 }
-

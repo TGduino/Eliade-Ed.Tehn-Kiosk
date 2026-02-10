@@ -24,7 +24,6 @@ export async function POST(request: NextRequest) {
   try {
     const { name, url_template, icon_url, allow_url_preview, iframe_enabled } = await request.json()
 
-    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabaseAdmin
       .from('session_types')
       .insert({
@@ -53,7 +52,6 @@ export async function PUT(request: NextRequest) {
   try {
     const { id, name, url_template, icon_url, allow_url_preview, iframe_enabled } = await request.json()
 
-    // @ts-expect-error - Supabase generated types issue
     const { data, error } = await supabaseAdmin
       .from('session_types')
       .update({
@@ -99,4 +97,3 @@ export async function DELETE(request: NextRequest) {
     )
   }
 }
-
