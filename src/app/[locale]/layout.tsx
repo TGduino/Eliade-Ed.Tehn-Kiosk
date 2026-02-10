@@ -30,7 +30,7 @@ export default async function RootLayout({
     console.log('[Layout] Locale:', locale, '-> Valid locale:', validLocale)
     
     // Direct import - bypass getMessages() completely for reliability
-    let messages = {}
+    let messages: Record<string, any> = {}
     console.log('[Layout] Loading messages for locale:', validLocale)
     
     try {
@@ -54,18 +54,54 @@ export default async function RootLayout({
         messages = enMessages.default || {}
         console.log('[Layout] Fallback English messages loaded, keys:', Object.keys(messages).length)
       } catch (fallbackError) {
-        // If even English fails, use empty object - app will still render
+        // If even English fails, use minimal valid structure
         console.error('[Layout] Failed to load any messages:', fallbackError)
-        console.log('[Layout] Using empty messages object')
+        console.log('[Layout] Using minimal fallback messages')
+        messages = {
+          common: {
+            loading: 'Loading...',
+            error: 'Error',
+            success: 'Success'
+          },
+          kiosk: {
+            welcome: 'Welcome',
+            waitingForSession: 'Waiting for session...'
+          },
+          admin: {
+            welcome: 'Admin Dashboard'
+          }
+        }
       }
     }
 
+    // Validate messages structure
+    if (!messages || typeof messages !== 'object' || Object.keys(messages).length === 0) {
+      console.error('[Layout] Messages object is invalid, using fallback')
+      messages = {
+        common: { loading: 'Loading...', error: 'Error', success: 'Success' },
+        kiosk: { welcome: 'Welcome', waitingForSession: 'Waiting for session...' },
+        admin: { welcome: 'Admin Dashboard' }
+      }
+    }
+
+    console.log('[Layout] Final messages structure:', {
+      hasCommon: !!messages.common,
+      hasKiosk: !!messages.kiosk,
+      hasAdmin: !!messages.admin,
+      totalKeys: Object.keys(messages).length
+    })
+
     console.log('[Layout] Rendering HTML with locale:', validLocale)
+    console.log('[Layout] Messages type check:', typeof messages, 'is object:', typeof messages === 'object')
+    
+    // Ensure messages is serializable and valid
+    const serializedMessages = JSON.parse(JSON.stringify(messages))
+    
     return (
       <html lang={validLocale}>
         <body className="font-sans">
           <ErrorBoundary>
-            <NextIntlClientProvider locale={validLocale} messages={messages}>
+            <NextIntlClientProvider locale={validLocale} messages={serializedMessages}>
               {children}
               <Toaster />
             </NextIntlClientProvider>
