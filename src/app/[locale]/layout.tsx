@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
+import { getMessages } from 'next-intl/server'
 import { Toaster } from '@/components/ui/toaster'
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 import '../globals.css'
@@ -29,54 +30,43 @@ export default async function RootLayout({
     const validLocale = (locale === 'en' || locale === 'ro') ? locale : 'en'
     console.log('[Layout] Locale:', locale, '-> Valid locale:', validLocale)
     
-    // Direct import - bypass getMessages() completely for reliability
+    // Use getMessages() as next-intl expects - it handles the i18n config properly
     let messages: Record<string, any> = {}
     console.log('[Layout] Loading messages for locale:', validLocale)
     
     try {
-      if (validLocale === 'ro') {
-        console.log('[Layout] Attempting to load Romanian messages...')
-        const roMessages = await import(`../../../messages/ro.json`)
-        messages = roMessages.default || {}
-        console.log('[Layout] Romanian messages loaded, keys:', Object.keys(messages).length)
-      } else {
-        console.log('[Layout] Attempting to load English messages...')
-        const enMessages = await import(`../../../messages/en.json`)
-        messages = enMessages.default || {}
-        console.log('[Layout] English messages loaded, keys:', Object.keys(messages).length)
-      }
+      console.log('[Layout] Calling getMessages()...')
+      messages = await getMessages({ locale: validLocale })
+      console.log('[Layout] getMessages() succeeded, keys:', Object.keys(messages).length)
     } catch (error) {
-      console.error('[Layout] Failed to load messages for', validLocale, ':', error)
-      // Fallback to English if anything fails
+      console.error('[Layout] getMessages() failed:', error)
+      console.error('[Layout] Error details:', error instanceof Error ? error.message : String(error))
+      
+      // Fallback: try direct import
       try {
-        console.log('[Layout] Falling back to English messages...')
-        const enMessages = await import(`../../../messages/en.json`)
-        messages = enMessages.default || {}
-        console.log('[Layout] Fallback English messages loaded, keys:', Object.keys(messages).length)
+        console.log('[Layout] Falling back to direct import...')
+        if (validLocale === 'ro') {
+          const roMessages = await import(`../../../messages/ro.json`)
+          messages = roMessages.default || {}
+        } else {
+          const enMessages = await import(`../../../messages/en.json`)
+          messages = enMessages.default || {}
+        }
+        console.log('[Layout] Direct import succeeded, keys:', Object.keys(messages).length)
       } catch (fallbackError) {
-        // If even English fails, use minimal valid structure
-        console.error('[Layout] Failed to load any messages:', fallbackError)
-        console.log('[Layout] Using minimal fallback messages')
+        console.error('[Layout] Direct import also failed:', fallbackError)
+        // Last resort: minimal fallback
         messages = {
-          common: {
-            loading: 'Loading...',
-            error: 'Error',
-            success: 'Success'
-          },
-          kiosk: {
-            welcome: 'Welcome',
-            waitingForSession: 'Waiting for session...'
-          },
-          admin: {
-            welcome: 'Admin Dashboard'
-          }
+          common: { loading: 'Loading...', error: 'Error', success: 'Success' },
+          kiosk: { welcome: 'Welcome', waitingForSession: 'Waiting for session...' },
+          admin: { welcome: 'Admin Dashboard' }
         }
       }
     }
 
-    // Validate messages structure
+    // Final validation
     if (!messages || typeof messages !== 'object' || Object.keys(messages).length === 0) {
-      console.error('[Layout] Messages object is invalid, using fallback')
+      console.error('[Layout] Messages validation failed, using minimal fallback')
       messages = {
         common: { loading: 'Loading...', error: 'Error', success: 'Success' },
         kiosk: { welcome: 'Welcome', waitingForSession: 'Waiting for session...' },
@@ -84,18 +74,13 @@ export default async function RootLayout({
       }
     }
 
-    console.log('[Layout] Final messages structure:', {
+    console.log('[Layout] Final messages check:', {
+      type: typeof messages,
+      isObject: typeof messages === 'object',
+      keys: Object.keys(messages).length,
       hasCommon: !!messages.common,
-      hasKiosk: !!messages.kiosk,
-      hasAdmin: !!messages.admin,
-      totalKeys: Object.keys(messages).length
+      hasKiosk: !!messages.kiosk
     })
-
-    console.log('[Layout] Rendering HTML with locale:', validLocale)
-    console.log('[Layout] Messages type check:', typeof messages, 'is object:', typeof messages === 'object')
-    
-    // Ensure messages is serializable and valid
-    const serializedMessages = JSON.parse(JSON.stringify(messages))
     
     return (
       <html lang={validLocale}>
