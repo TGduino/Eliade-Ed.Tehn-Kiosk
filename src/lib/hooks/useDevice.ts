@@ -43,7 +43,7 @@ export function useDevice() {
               device_name: deviceName,
               is_active: true,
               last_seen: new Date().toISOString(),
-            })
+            } as any)
             .select()
             .single()
 
@@ -77,7 +77,7 @@ export function useDevice() {
             battery_charging: battery.charging,
             uptime_seconds: uptimeSeconds,
             updated_at: new Date().toISOString(),
-          })
+          } as any)
           .eq('device_fingerprint', id)
       }, 30000)
     }
@@ -97,7 +97,7 @@ export function useDevice() {
 
     const { data, error } = await supabase
       .from('devices')
-      .update({ device_name: name })
+      .update({ device_name: name } as any)
       .eq('device_fingerprint', deviceId)
       .select()
       .single()

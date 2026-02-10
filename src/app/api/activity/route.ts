@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         mouse_activity_count: mouse_activity_count || 0,
         keyboard_activity_count: keyboard_activity_count || 0,
         recorded_at: new Date().toISOString(),
-      })
+      } as any)
       .select()
       .single()
 

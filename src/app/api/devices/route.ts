@@ -30,7 +30,7 @@ export async function PUT(request: NextRequest) {
 
     const { data, error } = await supabaseAdmin
       .from('devices')
-      .update({ device_name })
+      .update({ device_name } as any)
       .eq('id', id)
       .select()
       .single()

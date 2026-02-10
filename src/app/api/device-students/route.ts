@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
           student_names,
           session_id: session_id || null,
           joined_at: new Date().toISOString(),
-        })
+        } as any)
         .eq('id', existing.id)
         .select()
         .single()
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
           device_id,
           student_names,
           session_id: session_id || null,
-        })
+        } as any)
         .select()
         .single()
 

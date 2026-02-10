@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         icon_url: icon_url || null,
         allow_url_preview: allow_url_preview || false,
         iframe_enabled: iframe_enabled !== false,
-      })
+      } as any)
       .select()
       .single()
 
@@ -60,7 +60,7 @@ export async function PUT(request: NextRequest) {
         icon_url,
         allow_url_preview,
         iframe_enabled,
-      })
+      } as any)
       .eq('id', id)
       .select()
       .single()

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         created_by: 'admin',
         started_at: new Date().toISOString(),
         settings: settings || null,
-      })
+      } as any)
       .select()
       .single()
 
