@@ -5,10 +5,17 @@ export const locales = ['en', 'ro'] as const
 export type Locale = (typeof locales)[number]
 
 export default getRequestConfig(async ({ locale }) => {
-  if (!locales.includes(locale as any)) notFound()
-
-  return {
-    messages: (await import(`../messages/${locale}.json`)).default
+  const validLocale = locales.includes(locale as any) ? locale : 'en'
+  
+  try {
+    return {
+      messages: (await import(`../messages/${validLocale}.json`)).default
+    }
+  } catch (error) {
+    // Fallback to English if locale file doesn't exist
+    return {
+      messages: (await import(`../messages/en.json`)).default
+    }
   }
 })
 
