@@ -16,8 +16,8 @@ interface Screenshot {
   created_at: string
   device_id: string
   session_id: string | null
-  devices?: { device_name: string }
-  sessions?: { name: string }
+  devices?: { device_name: string } | { device_name: string }[] | null
+  sessions?: { name: string } | { name: string }[] | null
 }
 
 export function ScreenshotGallery() {
@@ -49,7 +49,15 @@ export function ScreenshotGallery() {
       const { data, error } = await query
 
       if (error) throw error
-      setScreenshots((data as Screenshot[]) || [])
+      
+      // Transform data to handle array responses from Supabase
+      const transformed = (data || []).map((item: any) => ({
+        ...item,
+        devices: Array.isArray(item.devices) ? item.devices[0] : item.devices,
+        sessions: Array.isArray(item.sessions) ? item.sessions[0] : item.sessions,
+      }))
+      
+      setScreenshots(transformed as Screenshot[])
       setLoading(false)
     } catch (error) {
       console.error('Failed to fetch screenshots:', error)
@@ -106,14 +114,16 @@ export function ScreenshotGallery() {
               </div>
               <CardContent className="p-3">
                 <p className="text-xs font-medium truncate">
-                  {(screenshot.devices as any)?.device_name || 'Unknown'}
+                  {screenshot.devices && !Array.isArray(screenshot.devices) 
+                    ? screenshot.devices.device_name 
+                    : 'Unknown'}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {format(new Date(screenshot.created_at), 'MMM dd, HH:mm')}
                 </p>
-                {(screenshot.sessions as any)?.name && (
+                {screenshot.sessions && !Array.isArray(screenshot.sessions) && screenshot.sessions.name && (
                   <p className="text-xs text-primary mt-1 truncate">
-                    {(screenshot.sessions as any).name}
+                    {screenshot.sessions.name}
                   </p>
                 )}
               </CardContent>
@@ -150,9 +160,12 @@ export function ScreenshotGallery() {
                   onClick={() => {
                     const screenshot = screenshots.find(s => s.screenshot_url === selectedImage)
                     if (screenshot) {
+                      const deviceName = screenshot.devices && !Array.isArray(screenshot.devices)
+                        ? screenshot.devices.device_name
+                        : 'device'
                       handleDownload(
                         selectedImage,
-                        (screenshot.devices as any)?.device_name || 'device',
+                        deviceName,
                         format(new Date(screenshot.created_at), 'yyyy-MM-dd-HHmm')
                       )
                     }
