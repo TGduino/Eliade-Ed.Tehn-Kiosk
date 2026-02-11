@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { NextIntlClientProvider } from 'next-intl'
+import { getMessages } from 'next-intl/server'
 import { Toaster } from '@/components/ui/toaster'
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 import '../globals.css'
@@ -28,89 +29,9 @@ export default async function RootLayout({
     
     const locale = resolvedParams?.locale || 'en'
     const validLocale = (locale === 'en' || locale === 'ro') ? locale : 'en'
-    console.log('[Layout] Locale:', locale, '-> Valid locale:', validLocale)
     
-    // Use getMessages() as next-intl expects - it handles the i18n config properly
-    let messages: Record<string, any> = {}
-    console.log('[Layout] Loading messages for locale:', validLocale)
-    
-    // Bypass getMessages() completely - use direct imports for reliability
-    try {
-      console.log('[Layout] Loading messages via direct import for locale:', validLocale)
-      if (validLocale === 'ro') {
-        const roMessages = await import(`../../../messages/ro.json`)
-        messages = roMessages.default || {}
-        console.log('[Layout] Romanian messages loaded, keys:', Object.keys(messages).length)
-      } else {
-        const enMessages = await import(`../../../messages/en.json`)
-        messages = enMessages.default || {}
-        console.log('[Layout] English messages loaded, keys:', Object.keys(messages).length)
-      }
-    } catch (error) {
-      console.error('[Layout] Direct import failed:', error)
-      console.error('[Layout] Error type:', error instanceof Error ? error.constructor.name : typeof error)
-      console.error('[Layout] Error message:', error instanceof Error ? error.message : String(error))
-      console.error('[Layout] Error stack:', error instanceof Error ? error.stack : 'No stack')
-      
-      // Fallback to English
-      try {
-        console.log('[Layout] Falling back to English...')
-        const enMessages = await import(`../../../messages/en.json`)
-        messages = enMessages.default || {}
-        console.log('[Layout] English fallback loaded, keys:', Object.keys(messages).length)
-      } catch (fallbackError) {
-        console.error('[Layout] English fallback also failed:', fallbackError)
-        // Last resort: minimal fallback
-        messages = {
-          common: { loading: 'Loading...', error: 'Error', success: 'Success' },
-          kiosk: { welcome: 'Welcome', waitingForSession: 'Waiting for session...' },
-          admin: { welcome: 'Admin Dashboard' }
-        }
-        console.log('[Layout] Using minimal fallback messages')
-      }
-    }
-
-    // Final validation
-    if (!messages || typeof messages !== 'object' || Object.keys(messages).length === 0) {
-      console.error('[Layout] Messages validation failed, using minimal fallback')
-      messages = {
-        common: { loading: 'Loading...', error: 'Error', success: 'Success' },
-        kiosk: { welcome: 'Welcome', waitingForSession: 'Waiting for session...' },
-        admin: { welcome: 'Admin Dashboard' }
-      }
-    }
-
-    console.log('[Layout] Final messages check:', {
-      type: typeof messages,
-      isObject: typeof messages === 'object',
-      keys: Object.keys(messages).length,
-      hasCommon: !!messages.common,
-      hasKiosk: !!messages.kiosk
-    })
-    
-    // Validate messages one more time before passing to NextIntlClientProvider
-    if (!messages || typeof messages !== 'object') {
-      console.error('[Layout] Messages validation failed at render time!')
-      throw new Error('Messages object is invalid')
-    }
-    
-    // Ensure messages is a plain serializable object
-    let plainMessages: Record<string, any>
-    try {
-      plainMessages = JSON.parse(JSON.stringify(messages))
-      console.log('[Layout] Messages serialized successfully')
-    } catch (serializeError) {
-      console.error('[Layout] Failed to serialize messages:', serializeError)
-      // Use minimal fallback if serialization fails
-      plainMessages = {
-        common: { loading: 'Loading...', error: 'Error', success: 'Success' },
-        kiosk: { welcome: 'Welcome', waitingForSession: 'Waiting for session...' },
-        admin: { welcome: 'Admin Dashboard' }
-      }
-    }
-    
-    console.log('[Layout] About to render NextIntlClientProvider with locale:', validLocale)
-    console.log('[Layout] Messages keys count:', Object.keys(plainMessages).length)
+    // Use getMessages() from next-intl/server - it works with our i18n.ts config
+    const messages = await getMessages()
     
     // Wrap children in Suspense to catch any async errors
     return (
@@ -122,7 +43,7 @@ export default async function RootLayout({
                 <p>Loading...</p>
               </div>
             }>
-              <NextIntlClientProvider locale={validLocale} messages={plainMessages}>
+              <NextIntlClientProvider locale={validLocale} messages={messages}>
                 <Suspense fallback={<div>Loading content...</div>}>
                   {children}
                 </Suspense>
