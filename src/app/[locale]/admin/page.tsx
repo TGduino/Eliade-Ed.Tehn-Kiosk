@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { LogOut, Monitor, Activity, Settings } from 'lucide-react'
+import { LogOut, Monitor, Activity, Settings, BarChart3, Image as ImageIcon, Download, Search, Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Logo } from '@/components/shared/Logo'
@@ -12,10 +12,13 @@ import { StatsDashboard } from '@/components/admin/StatsDashboard'
 import { DeviceMonitor } from '@/components/admin/DeviceMonitor'
 import { SessionControl } from '@/components/admin/SessionControl'
 import { SessionTypeManager } from '@/components/admin/SessionTypeManager'
+import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard'
+import { ScreenshotGallery } from '@/components/admin/ScreenshotGallery'
 import { useRealtimeDevices } from '@/lib/hooks/useRealtimeDevices'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
 import type { Device, Session, SessionType } from '@/types'
 
@@ -165,10 +168,14 @@ export default function AdminDashboardPage() {
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8">
         <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="grid w-full max-w-2xl grid-cols-4 bg-white shadow-md border border-gray-200">
+          <TabsList className="grid w-full max-w-5xl grid-cols-7 bg-white shadow-md border border-gray-200">
             <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Activity className="h-4 w-4 mr-2" />
               {t('overview')}
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Analytics
             </TabsTrigger>
             <TabsTrigger value="devices" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Monitor className="h-4 w-4 mr-2" />
@@ -176,6 +183,14 @@ export default function AdminDashboardPage() {
             </TabsTrigger>
             <TabsTrigger value="sessions" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               {t('sessions')}
+            </TabsTrigger>
+            <TabsTrigger value="screenshots" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <ImageIcon className="h-4 w-4 mr-2" />
+              Screenshots
+            </TabsTrigger>
+            <TabsTrigger value="export" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Download className="h-4 w-4 mr-2" />
+              Export
             </TabsTrigger>
             <TabsTrigger value="config" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Settings className="h-4 w-4 mr-2" />
@@ -215,6 +230,123 @@ export default function AdminDashboardPage() {
               sessionTypes={sessionTypes}
               onRefresh={fetchSessions}
             />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <AnalyticsDashboard />
+          </TabsContent>
+
+          <TabsContent value="screenshots">
+            <ScreenshotGallery />
+          </TabsContent>
+
+          <TabsContent value="export" className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Export Data</h2>
+              <p className="text-muted-foreground mb-6">
+                Download data in CSV or JSON format for analysis
+              </p>
+              <div className="grid gap-4 md:grid-cols-3">
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="pt-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-semibold mb-2">Sessions</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Export all session data including status, timestamps, and types
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open('/api/export?type=sessions&format=csv', '_blank')}
+                          className="flex-1"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          CSV
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open('/api/export?type=sessions&format=json', '_blank')}
+                          className="flex-1"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          JSON
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="pt-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-semibold mb-2">Devices</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Export device information, status, and battery levels
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open('/api/export?type=devices&format=csv', '_blank')}
+                          className="flex-1"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          CSV
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open('/api/export?type=devices&format=json', '_blank')}
+                          className="flex-1"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          JSON
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="pt-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-semibold mb-2">Activity</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Export activity logs including mouse and keyboard events
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open('/api/export?type=activity&format=csv', '_blank')}
+                          className="flex-1"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          CSV
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open('/api/export?type=activity&format=json', '_blank')}
+                          className="flex-1"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          JSON
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="config">
