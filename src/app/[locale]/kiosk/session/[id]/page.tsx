@@ -98,7 +98,11 @@ export default function SessionPage() {
       />
 
       <div className="flex-1">
-        <SessionViewer url={sessionType.url_template} sessionId={id} />
+        <SessionViewer 
+          url={sessionType.url_template} 
+          sessionId={id}
+          iframeEnabled={sessionType.iframe_enabled}
+        />
       </div>
 
       <ActivityTracker

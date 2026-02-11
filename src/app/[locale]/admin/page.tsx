@@ -13,7 +13,7 @@ import { DeviceMonitor } from '@/components/admin/DeviceMonitor'
 import { SessionControl } from '@/components/admin/SessionControl'
 import { SessionTypeManager } from '@/components/admin/SessionTypeManager'
 import { useRealtimeDevices } from '@/lib/hooks/useRealtimeDevices'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
@@ -135,21 +135,25 @@ export default function AdminDashboardPage() {
     : 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Header */}
-      <header className="bg-secondary text-secondary-foreground shadow-lg">
-        <div className="container mx-auto px-6 py-4">
+      <header className="bg-secondary text-secondary-foreground shadow-lg border-b-4 border-primary">
+        <div className="container mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Logo size={50} />
+              <Logo size={55} />
               <div>
-                <h1 className="text-2xl font-bold">{t('welcome')}</h1>
-                <p className="text-sm opacity-90">Mircea Eliade School</p>
+                <h1 className="text-3xl font-bold">{t('welcome')}</h1>
+                <p className="text-sm opacity-90 mt-0.5">Mircea Eliade School - Admin Dashboard</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <LanguageToggle />
-              <Button variant="outline" onClick={handleLogout} className="gap-2">
+              <Button 
+                variant="outline" 
+                onClick={handleLogout} 
+                className="gap-2 bg-white/10 hover:bg-white/20 border-white/20 text-white"
+              >
                 <LogOut className="h-4 w-4" />
                 {t('logout')}
               </Button>
@@ -160,20 +164,20 @@ export default function AdminDashboardPage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8">
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full max-w-xl grid-cols-4">
-            <TabsTrigger value="overview">
+        <Tabs defaultValue="overview" className="space-y-8">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4 bg-white shadow-md border border-gray-200">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Activity className="h-4 w-4 mr-2" />
               {t('overview')}
             </TabsTrigger>
-            <TabsTrigger value="devices">
+            <TabsTrigger value="devices" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Monitor className="h-4 w-4 mr-2" />
               {t('devices')}
             </TabsTrigger>
-            <TabsTrigger value="sessions">
+            <TabsTrigger value="sessions" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               {t('sessions')}
             </TabsTrigger>
-            <TabsTrigger value="config">
+            <TabsTrigger value="config" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Settings className="h-4 w-4 mr-2" />
               {t('config')}
             </TabsTrigger>
@@ -227,6 +231,9 @@ export default function AdminDashboardPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('rename')} Device</DialogTitle>
+            <DialogDescription>
+              Change the display name for this device
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>

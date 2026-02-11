@@ -35,21 +35,21 @@ export function StudentNameInput({ students, onStudentsChange }: StudentNameInpu
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-xl">{t('students')}</CardTitle>
+    <Card className="w-full shadow-lg border-2">
+      <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b">
+        <CardTitle className="text-2xl font-bold">{t('students')}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex gap-2">
+      <CardContent className="space-y-4 pt-6">
+        <div className="flex gap-3">
           <Input
             type="text"
             placeholder={t('enterName')}
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1 text-lg"
+            className="flex-1 text-lg h-12 border-2 focus:border-primary"
           />
-          <Button onClick={handleAddStudent} size="lg" className="gap-2">
+          <Button onClick={handleAddStudent} size="lg" className="gap-2 px-6 h-12 shadow-md">
             <Plus className="h-5 w-5" />
             {t('addStudent')}
           </Button>

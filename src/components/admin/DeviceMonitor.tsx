@@ -72,12 +72,12 @@ export function DeviceMonitor({ devices, onRename, onRemove }: DeviceMonitorProp
         const latestStudents = device.students?.[0]
 
         return (
-          <Card key={device.id} className="overflow-hidden">
-            <CardHeader className="pb-3">
+          <Card key={device.id} className="overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-3 bg-gradient-to-r from-gray-50 to-white">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <span className={`h-2 w-2 rounded-full ${getStatusColor(status)}`} />
+                  <CardTitle className="text-lg flex items-center gap-2 font-semibold">
+                    <span className={`h-3 w-3 rounded-full ${getStatusColor(status)} animate-pulse`} />
                     {device.device_name}
                   </CardTitle>
                   <p className="text-xs text-muted-foreground mt-1 font-mono">
@@ -89,15 +89,17 @@ export function DeviceMonitor({ devices, onRename, onRemove }: DeviceMonitorProp
                     variant="ghost"
                     size="sm"
                     onClick={() => onRename(device)}
+                    className="hover:bg-primary/10"
                   >
-                    <Edit2 className="h-3 w-3" />
+                    <Edit2 className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => onRemove(device)}
+                    className="hover:bg-destructive/10 hover:text-destructive"
                   >
-                    <Trash2 className="h-3 w-3" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

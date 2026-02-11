@@ -133,7 +133,7 @@ export function SessionTypeManager({ sessionTypes, onRefresh }: SessionTypeManag
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{t('manageSessionTypes')}</h2>
-        <Button onClick={() => handleOpenDialog()} className="gap-2">
+        <Button onClick={() => handleOpenDialog()} className="gap-2 shadow-md">
           <Plus className="h-4 w-4" />
           {t('addSessionType')}
         </Button>

@@ -141,7 +141,7 @@ export function SessionControl({ sessions, sessionTypes, onRefresh }: SessionCon
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{t('sessions')}</h2>
-        <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
+        <Button onClick={() => setShowCreateDialog(true)} className="gap-2 shadow-md">
           <Plus className="h-4 w-4" />
           {t('createSession')}
         </Button>
@@ -160,11 +160,11 @@ export function SessionControl({ sessions, sessionTypes, onRefresh }: SessionCon
           </Card>
         ) : (
           activeSessions.map((session) => (
-            <Card key={session.id}>
+            <Card key={session.id} className="shadow-md hover:shadow-lg transition-shadow">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg">{session.name}</CardTitle>
+                    <CardTitle className="text-lg font-semibold">{session.name}</CardTitle>
                     <p className="text-sm text-muted-foreground mt-1">
                       Started: {new Date(session.started_at!).toLocaleString()}
                     </p>
@@ -176,6 +176,7 @@ export function SessionControl({ sessions, sessionTypes, onRefresh }: SessionCon
                         variant="outline"
                         size="sm"
                         onClick={() => handleUpdateSession(session.id, 'paused')}
+                        className="shadow-sm"
                       >
                         <Pause className="h-4 w-4" />
                       </Button>
@@ -185,6 +186,7 @@ export function SessionControl({ sessions, sessionTypes, onRefresh }: SessionCon
                         variant="outline"
                         size="sm"
                         onClick={() => handleUpdateSession(session.id, 'active')}
+                        className="shadow-sm"
                       >
                         <Play className="h-4 w-4" />
                       </Button>
@@ -193,6 +195,7 @@ export function SessionControl({ sessions, sessionTypes, onRefresh }: SessionCon
                       variant="destructive"
                       size="sm"
                       onClick={() => handleUpdateSession(session.id, 'completed')}
+                      className="shadow-sm"
                     >
                       <StopCircle className="h-4 w-4" />
                     </Button>
