@@ -112,9 +112,9 @@ export function SessionViewer({ url, sessionId, iframeEnabled = true, onActivity
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
-  // Use proxy if iframe is blocked or disabled
+  // Always use proxy for auto-login support and CSP bypass
   const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`
-  const iframeSrc = (iframeBlocked || !iframeEnabled) ? proxyUrl : url
+  const iframeSrc = proxyUrl
 
   return (
     <div className="w-full h-screen">

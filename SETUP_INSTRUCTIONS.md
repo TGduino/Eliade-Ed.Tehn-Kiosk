@@ -40,6 +40,10 @@ JWT_SECRET=your-secret-key-at-least-32-characters-long
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Auto-Login (Optional - for automatic platform login)
+AUTO_LOGIN_EMAIL=elevi.ed.tehn.eliade@gmail.com
+AUTO_LOGIN_PASSWORD=Pereu@1973
 ```
 
 ### 4. Run Development Server
