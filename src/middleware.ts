@@ -49,6 +49,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Exclude API routes, Next.js internals, and static files
+  // But we need to handle all page routes for i18n
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
 }
 

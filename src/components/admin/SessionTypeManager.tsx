@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
 import type { SessionType } from '@/types'
 
@@ -37,6 +38,7 @@ export function SessionTypeManager({ sessionTypes, onRefresh }: SessionTypeManag
     icon_url: '',
     allow_url_preview: false,
     iframe_enabled: true,
+    embed_strategy: 'auto' as 'auto' | 'iframe' | 'edge-proxy' | 'popup',
   })
 
   const handleOpenDialog = (type?: SessionType) => {
@@ -48,6 +50,7 @@ export function SessionTypeManager({ sessionTypes, onRefresh }: SessionTypeManag
         icon_url: type.icon_url || '',
         allow_url_preview: type.allow_url_preview,
         iframe_enabled: type.iframe_enabled,
+        embed_strategy: (type as any).embed_strategy || 'auto',
       })
     } else {
       setEditingType(null)
@@ -57,6 +60,7 @@ export function SessionTypeManager({ sessionTypes, onRefresh }: SessionTypeManag
         icon_url: '',
         allow_url_preview: false,
         iframe_enabled: true,
+        embed_strategy: 'auto',
       })
     }
     setShowDialog(true)

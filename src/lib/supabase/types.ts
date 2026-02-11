@@ -113,6 +113,7 @@ export type Database = {
           icon_url: string | null
           allow_url_preview: boolean
           iframe_enabled: boolean
+          embed_strategy: 'auto' | 'iframe' | 'edge-proxy' | 'popup'
           created_at: string
         }
         Insert: {
@@ -122,6 +123,7 @@ export type Database = {
           icon_url?: string | null
           allow_url_preview?: boolean
           iframe_enabled?: boolean
+          embed_strategy?: 'auto' | 'iframe' | 'edge-proxy' | 'popup'
           created_at?: string
         }
         Update: {
@@ -131,6 +133,7 @@ export type Database = {
           icon_url?: string | null
           allow_url_preview?: boolean
           iframe_enabled?: boolean
+          embed_strategy?: 'auto' | 'iframe' | 'edge-proxy' | 'popup'
           created_at?: string
         }
       }
