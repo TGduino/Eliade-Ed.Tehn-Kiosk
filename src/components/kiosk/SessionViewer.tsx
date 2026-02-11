@@ -112,9 +112,9 @@ export function SessionViewer({ url, sessionId, iframeEnabled = true, onActivity
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
-  // Always use proxy for auto-login support and CSP bypass
+  // Try direct URL first, fallback to proxy if CSP blocked
   const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`
-  const iframeSrc = proxyUrl
+  const iframeSrc = iframeBlocked ? proxyUrl : url
 
   return (
     <div className="w-full h-screen">

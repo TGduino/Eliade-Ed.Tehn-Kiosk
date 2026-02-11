@@ -31,14 +31,33 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Get original request headers to pass through
+    const requestHeaders: HeadersInit = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'DNT': '1',
+      'Connection': 'keep-alive',
+      'Upgrade-Insecure-Requests': '1',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Cache-Control': 'max-age=0',
+    }
+
+    // Pass through cookies from the original request if present
+    const cookieHeader = request.headers.get('cookie')
+    if (cookieHeader) {
+      requestHeaders['Cookie'] = cookieHeader
+    }
+
     // Fetch the content
     const response = await fetch(targetUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
+      headers: requestHeaders,
       redirect: 'follow',
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -55,23 +74,15 @@ export async function GET(request: NextRequest) {
     const autoLoginEmail = process.env.AUTO_LOGIN_EMAIL || 'elevi.ed.tehn.eliade@gmail.com'
     const autoLoginPassword = process.env.AUTO_LOGIN_PASSWORD || 'Pereu@1973'
 
-    // If it's HTML, rewrite URLs to go through our proxy and inject auto-login
+    // If it's HTML, inject auto-login and remove CSP restrictions
+    // But DON'T rewrite URLs - let the sites load normally
     let processedContent = content
     if (contentType.includes('text/html')) {
-      // Rewrite absolute URLs
+      // Remove CSP headers from meta tags that block iframe embedding
       processedContent = content
-        .replace(/href="(https?:\/\/[^"]+)"/g, (match, url) => {
-          return `href="/api/proxy?url=${encodeURIComponent(url)}"`
-        })
-        .replace(/src="(https?:\/\/[^"]+)"/g, (match, url) => {
-          return `src="/api/proxy?url=${encodeURIComponent(url)}"`
-        })
-        .replace(/action="(https?:\/\/[^"]+)"/g, (match, url) => {
-          return `action="/api/proxy?url=${encodeURIComponent(url)}"`
-        })
-        // Remove CSP headers from meta tags
         .replace(/<meta[^>]*http-equiv=["']Content-Security-Policy["'][^>]*>/gi, '')
         .replace(/<meta[^>]*http-equiv=["']X-Frame-Options["'][^>]*>/gi, '')
+        .replace(/<meta[^>]*name=["']referrer["'][^>]*>/gi, '')
 
       // Inject comprehensive auto-login script
       const autoLoginScript = `
@@ -434,15 +445,27 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Collect cookies from the response to pass back
+    const responseCookies = response.headers.get('set-cookie')
+
     // Return with proper headers
+    const responseHeaders: HeadersInit = {
+      'Content-Type': contentType,
+      'X-Frame-Options': 'SAMEORIGIN',
+      'X-Content-Type-Options': 'nosniff',
+      'Cache-Control': 'no-store, must-revalidate',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': 'true',
+    }
+
+    // Pass through cookies
+    if (responseCookies) {
+      responseHeaders['Set-Cookie'] = responseCookies
+    }
+
     return new NextResponse(processedContent, {
       status: 200,
-      headers: {
-        'Content-Type': contentType,
-        'X-Frame-Options': 'SAMEORIGIN',
-        'X-Content-Type-Options': 'nosniff',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-      },
+      headers: responseHeaders,
     })
   } catch (error) {
     console.error('Proxy error:', error)
