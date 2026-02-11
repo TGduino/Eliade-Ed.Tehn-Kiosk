@@ -112,47 +112,25 @@ export function SessionViewer({ url, sessionId, iframeEnabled = true, onActivity
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
-  // If iframe is blocked or disabled, show option to open in new window
-  if (iframeBlocked || !iframeEnabled) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-secondary-50 via-white to-primary-50 p-4">
-        <Card className="max-w-md w-full">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-4">
-              <div className="flex justify-center">
-                <AlertCircle className="h-12 w-12 text-primary" />
-              </div>
-              <h2 className="text-2xl font-bold text-secondary">
-                {t('sessionCannotEmbed') || 'Session Cannot Be Embedded'}
-              </h2>
-              <p className="text-muted-foreground">
-                {t('sessionOpenNewWindow') || 'This website cannot be displayed in an embedded frame. Click the button below to open it in a new window.'}
-              </p>
-              <Button 
-                onClick={handleOpenInNewWindow}
-                size="lg"
-                className="gap-2 w-full"
-              >
-                <ExternalLink className="h-5 w-5" />
-                {t('openInNewWindow') || 'Open in New Window'}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
+  // Use proxy if iframe is blocked or disabled
+  const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`
+  const iframeSrc = (iframeBlocked || !iframeEnabled) ? proxyUrl : url
 
   return (
     <div className="w-full h-screen">
       <iframe
         ref={iframeRef}
-        src={url}
+        src={iframeSrc}
         className="w-full h-full border-0"
         allow="camera; microphone; clipboard-read; clipboard-write"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-top-navigation"
         onLoad={() => setHasTriedIframe(true)}
-        onError={() => setIframeBlocked(true)}
+        onError={() => {
+          // If direct URL fails, try proxy
+          if (!iframeBlocked && iframeEnabled) {
+            setIframeBlocked(true)
+          }
+        }}
       />
     </div>
   )
